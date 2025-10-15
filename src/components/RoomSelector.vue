@@ -187,6 +187,7 @@ const getRoomImage = (room) => {
   font-size: 1.2rem;
   font-weight: bold;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  z-index: 10;
 }
 
 .polaroid-image {
