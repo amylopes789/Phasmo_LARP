@@ -50,6 +50,14 @@ A web-based interface for running a Live Action Roleplay event based on the Phas
   - **Demon**: No hunt cooldown after canceling
 - **Toggle on/off** from the main menu settings
 
+### 💡 LIFX Smart Light Integration
+- **Real smart light control** - Control actual LIFX bulbs in your venue
+- **Ultra Warm palette** - Default ON state uses warm orange glow (2500K)
+- **Three modes**: ON (Ultra Warm), OFF, and FLICKER (with Ultra Warm palette)
+- **Hunt colors** - Lights automatically turn RED during hunts, restore to Ultra Warm after
+- **Optional** - Works perfectly without LIFX lights
+- **Setup**: Create `.env` file with `VITE_LIFX_TOKEN=your_token` (get token from [LIFX Cloud](https://cloud.lifx.com/settings))
+
 ### 🔄 Real-Time Synchronization
 - **localStorage-based** state management
 - **Cross-device/tab sync** (500ms updates)
@@ -63,14 +71,21 @@ A web-based interface for running a Live Action Roleplay event based on the Phas
 npm install
 ```
 
-2. **Start development server:**
+2. **Optional - Configure LIFX Smart Lights:**
+```bash
+# Create .env file with your LIFX token
+echo "VITE_LIFX_TOKEN=your_token_here" > .env
+```
+Get token from [LIFX Cloud Settings](https://cloud.lifx.com/settings).
+
+3. **Start development server:**
 ```bash
 npm run dev
 ```
 
-3. **Open in browser:**
+4. **Open in browser:**
 ```
-http://localhost:3001
+http://localhost:3000/Phasmo_LARP/
 ```
 
 ## 🎭 Usage Guide

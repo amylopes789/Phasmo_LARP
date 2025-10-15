@@ -187,6 +187,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useSharedState } from '../composables/useSharedState'
 import RoomSelector from './RoomSelector.vue'
 import GhostTypeSelector from './GhostTypeSelector.vue'
+import * as lifx from '../utils/lifx'
   
   const { state, updateState, addLog, drainSanity } = useSharedState()
   
@@ -343,7 +344,12 @@ const clearLogs = () => {
   updateState({ activityLog: [] })
 }
 
-const setLight = (state) => {
+const setLight = async (state) => {
+  // Stop any existing flicker first
+  if (lightState.value === 'flicker') {
+    lifx.stopFlicker()
+  }
+  
   lightState.value = state
   updateState({ lightState: state })
   
@@ -354,6 +360,30 @@ const setLight = (state) => {
   }
   
   addLog(messages[state] || `Light state: ${state}`)
+  
+  // Control LIFX lights if configured
+  if (lifx.isLifxConfigured()) {
+    try {
+      if (state === 'on') {
+        const result = await lifx.turnOn()
+        if (result.success) {
+          console.log('LIFX lights turned ON')
+        }
+      } else if (state === 'off') {
+        const result = await lifx.turnOff()
+        if (result.success) {
+          console.log('LIFX lights turned OFF')
+        }
+      } else if (state === 'flicker') {
+        await lifx.startFlicker()
+        console.log('LIFX lights set to FLICKER')
+      }
+    } catch (error) {
+      console.error('LIFX control error:', error)
+    }
+  } else {
+    console.log('LIFX not configured - lights control is simulated only')
+  }
   
   sendPostMessage({
     type: 'smart_light',
@@ -445,7 +475,7 @@ const startHuntCooldown = () => {
   }
 }
 
-const toggleHunt = () => {
+const toggleHunt = async () => {
   if (isHunting.value) {
     // Cancel hunt
     isHunting.value = false
@@ -456,6 +486,16 @@ const toggleHunt = () => {
     if (huntTimeout) {
       clearTimeout(huntTimeout)
       huntTimeout = null
+    }
+    
+    // Restore LIFX lights to default Ultra Warm
+    if (lifx.isLifxConfigured()) {
+      try {
+        await lifx.restoreDefault()
+        console.log('LIFX lights restored to default Ultra Warm')
+      } catch (error) {
+        console.error('LIFX restore error:', error)
+      }
     }
     
     // Apply cooldown after cancelling
@@ -475,17 +515,37 @@ const toggleHunt = () => {
     updateState({ isHunting: true })
     addLog(`HUNT STARTED in ${selectedRoom.value}`)
     
+    // Set LIFX lights to RED for hunt
+    if (lifx.isLifxConfigured()) {
+      try {
+        await lifx.turnRed()
+        console.log('LIFX lights set to RED for hunt')
+      } catch (error) {
+        console.error('LIFX hunt color error:', error)
+      }
+    }
+    
     // Drain sanity (doubled for Yurei and Moroi)
     const baseDrain = 15
     const drainAmount = (selectedGhost.value === 'Yurei' || selectedGhost.value === 'Moroi') ? baseDrain * 2 : baseDrain
     drainSanity(drainAmount)
     
     // Hunt lasts 60 seconds
-    huntTimeout = setTimeout(() => {
+    huntTimeout = setTimeout(async () => {
       isHunting.value = false
       updateState({ isHunting: false })
       addLog('Hunt ended')
       huntTimeout = null
+      
+      // Restore LIFX lights to default Ultra Warm
+      if (lifx.isLifxConfigured()) {
+        try {
+          await lifx.restoreDefault()
+          console.log('LIFX lights restored to default Ultra Warm after hunt')
+        } catch (error) {
+          console.error('LIFX restore error:', error)
+        }
+      }
       
       // Apply cooldown after hunt ends
       startHuntCooldown()
@@ -521,6 +581,7 @@ onUnmounted(() => {
   if (syncInterval) clearInterval(syncInterval)
   if (huntTimeout) clearTimeout(huntTimeout)
   if (huntCooldownInterval) clearInterval(huntCooldownInterval)
+  lifx.stopFlicker() // Stop any active flicker effect
 })
   </script>
   
