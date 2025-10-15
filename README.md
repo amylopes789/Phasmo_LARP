@@ -45,6 +45,9 @@ A web-based interface for running a Live Action Roleplay event based on the Phas
 - **Sanity drain**:
   - Interact action: -5% sanity
   - Hunt action: -15% sanity
+- **Special ghost abilities**:
+  - **Yurei & Moroi**: Double sanity drain (-10% interact, -30% hunt)
+  - **Demon**: No hunt cooldown after canceling
 - **Toggle on/off** from the main menu settings
 
 ### 🔄 Real-Time Synchronization
@@ -156,10 +159,6 @@ PhasmoLARP/
 ├── vite.config.js
 └── package.json
 ```
-
-## 🎨 Customization
-
-See `PROJECT_OVERVIEW.md` for detailed technical documentation and customization guides.
 
 ## 🚀 Deployment
 

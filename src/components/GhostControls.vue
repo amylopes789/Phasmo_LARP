@@ -9,9 +9,9 @@
           <div class="tape"></div>
           <h2>Ghost Room</h2>
           <button @click="showRoomSelector = true" class="select-room-btn">
-            📍 Select Ghost Room
+            Select Ghost Room
           </button>
-          <p class="instruction-text">Click to choose the ghost's room from polaroid photos</p>
+          <p class="instruction-text">Click to choose the ghost's room</p>
         </div>
         
         <div v-else class="selected-room-polaroid" @click="showRoomSelector = true">
@@ -30,9 +30,9 @@
           <div class="tape"></div>
           <h2>Ghost Type</h2>
           <button @click="showGhostSelector = true" class="select-ghost-btn">
-            👻 Select Ghost Type
+            Select Ghost Type
           </button>
-          <p class="instruction-text">Click to choose the ghost type from polaroid photos</p>
+          <p class="instruction-text">Click to choose the ghost type</p>
         </div>
         
         <div v-else class="selected-ghost-polaroid" @click="showGhostSelector = true">
@@ -207,7 +207,7 @@ const rooms = [
 const ghostTypes = [
   { name: 'Spirit', evidence: ['EMF 5', 'Spirit Box', 'Ghost Writing'], behavior: 'No special strengths or weaknesses. Very common.' },
   { name: 'Wraith', evidence: ['EMF 5', 'Spirit Box', 'D.O.T.S.'], behavior: 'Never touches the ground. Cannot track with footsteps.' },
-  { name: 'Phantom', evidence: ['Spirit Box', 'UV', 'D.O.T.S.'], behavior: 'Disappears when photographed. Drains sanity faster.' },
+  { name: 'Phantom', evidence: ['Spirit Box', 'UV', 'D.O.T.S.'], behavior: 'Disappears when photographed.' },
   { name: 'Poltergeist', evidence: ['Spirit Box', 'UV', 'Ghost Writing'], behavior: 'Throws multiple objects at once. Very active.' },
   { name: 'Banshee', evidence: ['UV', 'Ghost Orbs', 'D.O.T.S.'], behavior: 'Targets one person at a time. Screams a lot. Scared of Crucifixes.' },
   { name: 'Jinn', evidence: ['EMF 5', 'UV', 'Freezing'], behavior: 'Moves faster when far from target.' },
@@ -226,7 +226,7 @@ const ghostTypes = [
   { name: 'Raiju', evidence: ['EMF 5', 'Ghost Orbs', 'D.O.T.S.'], behavior: 'Speeds up near electronics. Disrupts equipment.' },
   { name: 'Obake', evidence: ['EMF 5', 'UV', 'Ghost Orbs'], behavior: 'Can leave six-fingered prints. May not leave evidence.' },
   { name: 'The Mimic', evidence: ['Spirit Box', 'UV', 'Freezing'], behavior: 'Mimics other ghost behaviors. Shows fake Ghost Orbs.' },
-  { name: 'Moroi', evidence: ['Spirit Box', 'Ghost Writing', 'Freezing'], behavior: 'Speeds up with low sanity. Curses through Spirit Box.' },
+  { name: 'Moroi', evidence: ['Spirit Box', 'Ghost Writing', 'Freezing'], behavior: 'Speeds up with low sanity. Drains sanity faster.' },
   { name: 'Deogen', evidence: ['Spirit Box', 'Ghost Writing', 'D.O.T.S.'], behavior: 'Always knows location. Slow when close, fast when far.' },
   { name: 'Thaye', evidence: ['Ghost Orbs', 'Ghost Writing', 'D.O.T.S.'], behavior: 'Very active in the beginning, becomes less active over time.' }
 ]
@@ -390,8 +390,10 @@ const triggerInteraction = () => {
   const interaction = interactions[Math.floor(Math.random() * interactions.length)]
   addLog(`Ghost interaction: ${interaction}`)
   
-  // Drain sanity
-  drainSanity(5)
+  // Drain sanity (doubled for Yurei and Moroi)
+  const baseDrain = 5
+  const drainAmount = (selectedGhost.value === 'Yurei' || selectedGhost.value === 'Moroi') ? baseDrain * 2 : baseDrain
+  drainSanity(drainAmount)
   
   // Only apply cooldown if sanity is enabled
   if (state.sanityEnabled) {
@@ -433,8 +435,8 @@ const toggleHunt = () => {
       huntTimeout = null
     }
     
-    // Only apply cooldown if sanity is enabled
-    if (state.sanityEnabled) {
+    // Only apply cooldown if sanity is enabled AND ghost is not Demon
+    if (state.sanityEnabled && selectedGhost.value !== 'Demon') {
       // Start cooldown (double the interact cooldown)
       const baseCooldown = 20 // Base is 20 seconds (double of interact's 10)
       const sanityMultiplier = state.sanity / 100
@@ -467,8 +469,10 @@ const toggleHunt = () => {
     updateState({ isHunting: true })
     addLog(`HUNT STARTED in ${selectedRoom.value}`)
     
-    // Drain sanity
-    drainSanity(15)
+    // Drain sanity (doubled for Yurei and Moroi)
+    const baseDrain = 15
+    const drainAmount = (selectedGhost.value === 'Yurei' || selectedGhost.value === 'Moroi') ? baseDrain * 2 : baseDrain
+    drainSanity(drainAmount)
     
     // Hunt lasts 30 seconds
     huntTimeout = setTimeout(() => {
