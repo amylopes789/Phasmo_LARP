@@ -158,12 +158,28 @@ See `PROJECT_OVERVIEW.md` for detailed technical documentation and customization
 
 ## 🚀 Deployment
 
-### Build for Production
+### GitHub Pages
+
+This project is configured for automatic deployment to GitHub Pages.
+
+**Setup Instructions:**
+
+1. Push your code to GitHub
+2. Go to your repository settings
+3. Navigate to **Pages** (under "Code and automation")
+4. Under **Source**, select "GitHub Actions"
+5. Push to the `main` branch to trigger automatic deployment
+
+Your site will be available at: `https://<your-username>.github.io/Phasmo_LARP/`
+
+### Local Build
+
+**Build for Production:**
 ```bash
 npm run build
 ```
 
-### Preview Production Build
+**Preview Production Build:**
 ```bash
 npm run preview
 ```
