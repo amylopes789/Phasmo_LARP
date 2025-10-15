@@ -422,6 +422,29 @@ const triggerInteraction = () => {
   })
 }
   
+// Helper function to start hunt cooldown
+const startHuntCooldown = () => {
+  // Always apply cooldown if sanity is enabled, unless ghost is Demon
+  if (state.sanityEnabled && selectedGhost.value !== 'Demon') {
+    // Start cooldown (double the interact cooldown)
+    const baseCooldown = 20 // Base is 20 seconds (double of interact's 10)
+    const sanityMultiplier = state.sanity / 100
+    const cooldown = Math.max(10, Math.round(baseCooldown * sanityMultiplier))
+    
+    huntCooldown.value = cooldown
+    if (huntCooldownInterval) {
+      clearInterval(huntCooldownInterval)
+    }
+    huntCooldownInterval = setInterval(() => {
+      huntCooldown.value--
+      if (huntCooldown.value <= 0) {
+        clearInterval(huntCooldownInterval)
+        huntCooldownInterval = null
+      }
+    }, 1000)
+  }
+}
+
 const toggleHunt = () => {
   if (isHunting.value) {
     // Cancel hunt
@@ -435,25 +458,8 @@ const toggleHunt = () => {
       huntTimeout = null
     }
     
-    // Only apply cooldown if sanity is enabled AND ghost is not Demon
-    if (state.sanityEnabled && selectedGhost.value !== 'Demon') {
-      // Start cooldown (double the interact cooldown)
-      const baseCooldown = 20 // Base is 20 seconds (double of interact's 10)
-      const sanityMultiplier = state.sanity / 100
-      const cooldown = Math.max(10, Math.round(baseCooldown * sanityMultiplier))
-      
-      huntCooldown.value = cooldown
-      if (huntCooldownInterval) {
-        clearInterval(huntCooldownInterval)
-      }
-      huntCooldownInterval = setInterval(() => {
-        huntCooldown.value--
-        if (huntCooldown.value <= 0) {
-          clearInterval(huntCooldownInterval)
-          huntCooldownInterval = null
-        }
-      }, 1000)
-    }
+    // Apply cooldown after cancelling
+    startHuntCooldown()
     
     // Send POST message
     sendPostMessage({
@@ -474,14 +480,16 @@ const toggleHunt = () => {
     const drainAmount = (selectedGhost.value === 'Yurei' || selectedGhost.value === 'Moroi') ? baseDrain * 2 : baseDrain
     drainSanity(drainAmount)
     
-    // Hunt lasts 30 seconds
+    // Hunt lasts 60 seconds
     huntTimeout = setTimeout(() => {
       isHunting.value = false
       updateState({ isHunting: false })
       addLog('Hunt ended')
       huntTimeout = null
-      // No cooldown when hunt ends naturally
-    }, 30000)
+      
+      // Apply cooldown after hunt ends
+      startHuntCooldown()
+    }, 60000)
     
     // Send POST message
     sendPostMessage({
@@ -489,7 +497,7 @@ const toggleHunt = () => {
       action: 'start',
       room: selectedRoom.value,
       ghost: selectedGhost.value,
-      duration: 30,
+      duration: 60,
       timestamp: new Date().toISOString()
     })
   }

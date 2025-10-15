@@ -11,7 +11,7 @@ A web-based interface for running a Live Action Roleplay event based on the Phas
 - **Polaroid Ghost Type Selection** - Browse 24 ghost types with flippable polaroids showing evidence and behavior on the back
 - **Smart Light Controls** - Three-state control (ON, OFF, FLICKER) with visual feedback
 - **Ghost Interaction Trigger** - Random paranormal events with dynamic cooldowns
-- **Hunt Mode** - 30-second hunts with toggle on/off capability and cooldown when cancelled
+- **Hunt Mode** - 60-second hunts with toggle on/off capability and cooldown after every hunt
 - **Lined Paper Instructions** - Dynamic instructions based on selected ghost's evidence
 - **Activity Log** - Complete history of all ghost actions with clear function
 
@@ -88,7 +88,7 @@ http://localhost:3001
 3. **View Instructions**: Lined paper shows evidence-specific actions and general tips
 4. **Control Lights**: Toggle between ON, OFF, and FLICKER states
 5. **Trigger Interactions**: Random paranormal events (cooldown scales with sanity)
-6. **Manage Hunts**: Start 30-second hunts or cancel early (cooldown on cancel only)
+6. **Manage Hunts**: Start 60-second hunts or cancel early (cooldown applies after every hunt)
 
 ### Investigator Instructions
 1. **Track Evidence**: Click evidence buttons to cycle through states
