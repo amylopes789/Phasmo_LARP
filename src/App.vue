@@ -44,31 +44,58 @@
             When enabled, investigator sanity drains during ghost activities and affects cooldown times
           </p>
         </div>
+        <div class="setting-item">
+          <button @click="showLifxSettings = true" class="lifx-settings-btn">
+            💡 Configure LIFX Smart Lights
+          </button>
+          <p class="setting-description">
+            {{ lifxStatus }}
+          </p>
+        </div>
       </div>
     </div>
 
     <GhostControls v-else-if="selectedRole === 'ghost'" @back="selectedRole = null" />
     <InvestigatorView v-else-if="selectedRole === 'investigator'" @back="selectedRole = null" />
     <SwitchboardView v-else-if="selectedRole === 'switchboard'" @back="selectedRole = null" />
+    
+    <LifxSettings v-if="showLifxSettings" @close="showLifxSettings = false" @saved="checkLifxStatus" />
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import GhostControls from './components/GhostControls.vue'
 import InvestigatorView from './components/InvestigatorView.vue'
 import SwitchboardView from './components/SwitchboardView.vue'
+import LifxSettings from './components/LifxSettings.vue'
 import { useSharedState } from './composables/useSharedState'
 
 const { state, updateState } = useSharedState()
 
 const selectedRole = ref(null)
 const sanityEnabled = ref(state.sanityEnabled || false)
+const showLifxSettings = ref(false)
+const lifxConfigured = ref(false)
 
 // Asset URLs with base path
 const base = import.meta.env.BASE_URL
 const ghostPhotoUrl = `${base}assets/ghost.webp`
 const investigatorPhotoUrl = `${base}assets/investigator.webp`
+
+const lifxStatus = computed(() => {
+  return lifxConfigured.value 
+    ? '✅ LIFX Connected' 
+    : 'Click to connect your LIFX smart lights (optional)'
+})
+
+const checkLifxStatus = () => {
+  lifxConfigured.value = !!localStorage.getItem('lifx_token')
+}
+
+onMounted(() => {
+  checkLifxStatus()
+})
 
 const selectRole = (role) => {
   selectedRole.value = role
@@ -305,6 +332,27 @@ const toggleSanity = () => {
   padding-left: 36px;
   line-height: 1.4;
   font-style: italic;
+}
+
+.lifx-settings-btn {
+  width: 100%;
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1.1rem;
+  padding: 15px 20px;
+  border: 2px solid #4CAF50;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+  color: white;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  margin-bottom: 8px;
+}
+
+.lifx-settings-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, #45a049 0%, #4CAF50 100%);
 }
 </style>
 

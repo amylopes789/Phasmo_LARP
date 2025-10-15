@@ -7,7 +7,14 @@ const DEFAULT_COLORS = {
   red: 'hue:0 saturation:1 brightness:0.8'
 }
 
-const getToken = () => import.meta.env.VITE_LIFX_TOKEN || ''
+const getToken = () => {
+  // Try localStorage first (user-provided token)
+  const userToken = localStorage.getItem('lifx_token')
+  if (userToken) return userToken
+  
+  // Fallback to environment variable for development
+  return import.meta.env.VITE_LIFX_TOKEN || ''
+}
 
 export const isLifxConfigured = () => !!getToken()
 

@@ -56,7 +56,8 @@ A web-based interface for running a Live Action Roleplay event based on the Phas
 - **Three modes**: ON (Ultra Warm), OFF, and FLICKER (with Ultra Warm palette)
 - **Hunt colors** - Lights automatically turn RED during hunts, restore to Ultra Warm after
 - **Optional** - Works perfectly without LIFX lights
-- **Setup**: Create `.env` file with `VITE_LIFX_TOKEN=your_token` (get token from [LIFX Cloud](https://cloud.lifx.com/settings))
+- **Secure setup** - Each user enters their own token through settings interface (stored locally only)
+- **Easy configuration** - Click "Configure LIFX Smart Lights" button on main menu
 
 ### 🔄 Real-Time Synchronization
 - **localStorage-based** state management
@@ -71,22 +72,21 @@ A web-based interface for running a Live Action Roleplay event based on the Phas
 npm install
 ```
 
-2. **Optional - Configure LIFX Smart Lights:**
-```bash
-# Create .env file with your LIFX token
-echo "VITE_LIFX_TOKEN=your_token_here" > .env
-```
-Get token from [LIFX Cloud Settings](https://cloud.lifx.com/settings).
-
-3. **Start development server:**
+2. **Start development server:**
 ```bash
 npm run dev
 ```
 
-4. **Open in browser:**
+3. **Open in browser:**
 ```
 http://localhost:3000/Phasmo_LARP/
 ```
+
+4. **Optional - Configure LIFX Smart Lights:**
+   - Click "💡 Configure LIFX Smart Lights" on the main menu
+   - Get your token from [LIFX Cloud Settings](https://cloud.lifx.com/settings)
+   - Paste token and save
+   - Your token is stored locally in your browser only
 
 ## 🎭 Usage Guide
 
