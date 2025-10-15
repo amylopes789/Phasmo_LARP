@@ -131,9 +131,11 @@ Spirit, Wraith, Phantom, Poltergeist, Banshee, Jinn, Mare, Revenant, Shade, Demo
 ## 📁 Project Structure
 ```
 PhasmoLARP/
-├── assets/
-│   ├── ghost_rooms/          # Venue room photos
-│   └── ghost_types/          # Ghost character images
+├── public/
+│   └── assets/
+│       ├── evidence/             # Evidence type images
+│       ├── ghost_rooms/          # Venue room photos
+│       └── ghost_types/          # Ghost character images
 ├── src/
 │   ├── components/
 │   │   ├── GhostControls.vue        # Ghost player interface
@@ -147,6 +149,9 @@ PhasmoLARP/
 │   │   └── main.css                 # Global styles
 │   ├── App.vue                       # Main app with role selection
 │   └── main.js                       # Entry point
+├── .github/
+│   └── workflows/
+│       └── deploy.yml                # GitHub Pages deployment
 ├── index.html
 ├── vite.config.js
 └── package.json

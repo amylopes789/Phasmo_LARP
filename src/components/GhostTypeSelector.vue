@@ -95,7 +95,8 @@ const selectGhost = (ghostName) => {
 const getGhostImage = (ghostName) => {
   // Convert ghost name to filename format (e.g., "The Twins" -> "The_Twins")
   const filename = ghostName.replace(/ /g, '_') + '_Discovered.webp'
-  return `/assets/ghost_types/${filename}`
+  const base = import.meta.env.BASE_URL
+  return `${base}assets/ghost_types/${filename}`
 }
 </script>
 

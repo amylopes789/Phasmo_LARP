@@ -8,12 +8,12 @@
       
       <div class="roles-grid">
         <div class="role-polaroid ghost-polaroid" @click="selectRole('ghost')">
-          <div class="polaroid-photo ghost-photo"></div>
+          <div class="polaroid-photo ghost-photo" :style="{ backgroundImage: `url(${ghostPhotoUrl})` }"></div>
           <div class="polaroid-label">Ghost</div>
         </div>
         
         <div class="role-polaroid investigator-polaroid" @click="selectRole('investigator')">
-          <div class="polaroid-photo investigator-photo"></div>
+          <div class="polaroid-photo investigator-photo" :style="{ backgroundImage: `url(${investigatorPhotoUrl})` }"></div>
           <div class="polaroid-label">Investigator</div>
         </div>
       </div>
@@ -64,6 +64,11 @@ const { state, updateState } = useSharedState()
 
 const selectedRole = ref(null)
 const sanityEnabled = ref(state.sanityEnabled || false)
+
+// Asset URLs with base path
+const base = import.meta.env.BASE_URL
+const ghostPhotoUrl = `${base}assets/ghost.webp`
+const investigatorPhotoUrl = `${base}assets/investigator.webp`
 
 const selectRole = (role) => {
   selectedRole.value = role
@@ -202,11 +207,13 @@ const toggleSanity = () => {
 }
 
 .ghost-photo {
-  background-image: url('/assets/ghost.webp');
+  background-size: cover;
+  background-position: center;
 }
 
 .investigator-photo {
-  background-image: url('/assets/investigator.webp');
+  background-size: cover;
+  background-position: center;
 }
 
 .polaroid-label {

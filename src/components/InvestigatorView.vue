@@ -98,14 +98,15 @@ const { state } = useSharedState()
 const emit = defineEmits(['back'])
 
 // Evidence types with images
+const base = import.meta.env.BASE_URL
 const evidenceTypes = [
-  { name: 'EMF 5', image: '/assets/evidence/emf.webp' },
-  { name: 'D.O.T.S.', image: '/assets/evidence/dots.webp' },
-  { name: 'UV', image: '/assets/evidence/uv.webp' },
-  { name: 'Ghost Orbs', image: '/assets/evidence/ghost_orbs.webp' },
-  { name: 'Ghost Writing', image: '/assets/evidence/ghost_writing.webp' },
-  { name: 'Spirit Box', image: '/assets/evidence/spirit_box.webp' },
-  { name: 'Freezing', image: '/assets/evidence/thermometer.webp' }
+  { name: 'EMF 5', image: `${base}assets/evidence/emf.webp` },
+  { name: 'D.O.T.S.', image: `${base}assets/evidence/dots.webp` },
+  { name: 'UV', image: `${base}assets/evidence/uv.webp` },
+  { name: 'Ghost Orbs', image: `${base}assets/evidence/ghost_orbs.webp` },
+  { name: 'Ghost Writing', image: `${base}assets/evidence/ghost_writing.webp` },
+  { name: 'Spirit Box', image: `${base}assets/evidence/spirit_box.webp` },
+  { name: 'Freezing', image: `${base}assets/evidence/thermometer.webp` }
 ]
 
 // All ghosts with their evidence and behavior

@@ -45,16 +45,17 @@ const selectRoom = (room) => {
 }
 
 const getRoomImage = (room) => {
+  const base = import.meta.env.BASE_URL
   const images = {
-    'Living Room': '/assets/ghost_rooms/living_room.jpg',
-    'Kitchen': '/assets/ghost_rooms/kitchen.jpg',
-    'Garage': '/assets/ghost_rooms/garage.jpg',
-    'Nursery': '/assets/ghost_rooms/nursery.jpg',
-    'Main Bedroom': '/assets/ghost_rooms/main_bedroom.jpg',
-    'Bedroom w/ Ensuite': '/assets/ghost_rooms/bedoom_ensuite.jpg',
-    'Bathroom': '/assets/ghost_rooms/bathroom.jpg'
+    'Living Room': `${base}assets/ghost_rooms/living_room.jpg`,
+    'Kitchen': `${base}assets/ghost_rooms/kitchen.jpg`,
+    'Garage': `${base}assets/ghost_rooms/garage.jpg`,
+    'Nursery': `${base}assets/ghost_rooms/nursery.jpg`,
+    'Main Bedroom': `${base}assets/ghost_rooms/main_bedroom.jpg`,
+    'Bedroom w/ Ensuite': `${base}assets/ghost_rooms/bedoom_ensuite.jpg`,
+    'Bathroom': `${base}assets/ghost_rooms/bathroom.jpg`
   }
-  return images[room] || '/assets/ghost_rooms/living_room.jpg'
+  return images[room] || `${base}assets/ghost_rooms/living_room.jpg`
 }
 </script>
 
