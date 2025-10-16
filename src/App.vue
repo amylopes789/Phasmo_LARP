@@ -52,6 +52,14 @@
             {{ lifxStatus }}
           </p>
         </div>
+        <div class="setting-item">
+          <button @click="resetGame" class="reset-game-btn">
+            🔄 Reset Game
+          </button>
+          <p class="setting-description">
+            Clear all game state and start fresh
+          </p>
+        </div>
       </div>
     </div>
 
@@ -70,8 +78,9 @@ import InvestigatorView from './components/InvestigatorView.vue'
 import SwitchboardView from './components/SwitchboardView.vue'
 import LifxSettings from './components/LifxSettings.vue'
 import { useSharedState } from './composables/useSharedState'
+import * as lifx from './utils/lifx'
 
-const { state, updateState } = useSharedState()
+const { state, updateState, resetState } = useSharedState()
 
 const selectedRole = ref(null)
 const sanityEnabled = ref(state.sanityEnabled || false)
@@ -105,6 +114,28 @@ const toggleSanity = () => {
   updateState({ sanityEnabled: sanityEnabled.value })
   if (!sanityEnabled.value) {
     updateState({ sanity: 100 })
+  }
+}
+
+const resetGame = async () => {
+  if (confirm('Are you sure you want to reset the entire game? This will clear all progress.')) {
+    // Stop any flicker effect
+    lifx.stopFlicker()
+    
+    // Reset all game state
+    resetState()
+    
+    // Turn lights to default ON state if LIFX is configured
+    if (lifx.isLifxConfigured()) {
+      try {
+        await lifx.turnOn()
+        console.log('LIFX lights reset to default Ultra Warm')
+      } catch (error) {
+        console.error('LIFX reset error:', error)
+      }
+    }
+    
+    console.log('Game reset complete')
   }
 }
 </script>
@@ -353,6 +384,27 @@ const toggleSanity = () => {
   transform: translateY(-2px);
   box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.3);
   background: linear-gradient(135deg, #45a049 0%, #4CAF50 100%);
+}
+
+.reset-game-btn {
+  width: 100%;
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1.1rem;
+  padding: 15px 20px;
+  border: 2px solid #ff0844;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #ff0844 0%, #cc0036 100%);
+  color: white;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  margin-bottom: 8px;
+}
+
+.reset-game-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, #cc0036 0%, #ff0844 100%);
 }
 </style>
 

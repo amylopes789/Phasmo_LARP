@@ -93,7 +93,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useSharedState } from '../composables/useSharedState'
 
-const { state } = useSharedState()
+const { state, updateState } = useSharedState()
 
 const emit = defineEmits(['back'])
 
@@ -138,14 +138,18 @@ const allGhosts = [
 ]
 
 // Local state
-const evidenceState = ref({})
+const evidenceState = computed(() => state.evidenceState)
 const isHunting = ref(false)
 const sanity = ref(state.sanity || 100)
 
-// Initialize evidence states
-evidenceTypes.forEach(ev => {
-  evidenceState.value[ev.name] = null
-})
+// Initialize evidence states if not already set
+if (!state.evidenceState || Object.keys(state.evidenceState).length === 0) {
+  const initialState = {}
+  evidenceTypes.forEach(ev => {
+    initialState[ev.name] = null
+  })
+  state.evidenceState = initialState
+}
 
 // Computed
 const possibleGhosts = computed(() => {
@@ -169,14 +173,18 @@ const possibleGhosts = computed(() => {
 
 // Methods
 const cycleEvidence = (evidence) => {
-  const current = evidenceState.value[evidence]
+  const current = state.evidenceState[evidence]
+  const newState = { ...state.evidenceState }
+  
   if (current === null) {
-    evidenceState.value[evidence] = 'confirmed'
+    newState[evidence] = 'confirmed'
   } else if (current === 'confirmed') {
-    evidenceState.value[evidence] = 'ruled-out'
+    newState[evidence] = 'ruled-out'
   } else {
-    evidenceState.value[evidence] = null
+    newState[evidence] = null
   }
+  
+  updateState({ evidenceState: newState })
 }
 
 const getSanityClass = () => {

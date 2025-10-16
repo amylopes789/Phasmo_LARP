@@ -22,7 +22,8 @@ const loadState = () => {
     isHunting: false,
     activityLog: [],
     sanity: 100,
-    sanityEnabled: false
+    sanityEnabled: false,
+    evidenceState: {}
   }
 }
 
@@ -90,13 +91,14 @@ export function useSharedState() {
   const resetState = () => {
     state.ghostRoom = ''
     state.selectedGhost = ''
-    state.lightState = 'off'
+    state.lightState = 'on'
     state.upstairsLights = true
     state.downstairsLights = true
     state.isHunting = false
     state.activityLog = []
     state.sanity = 100
-    state.sanityEnabled = false
+    // Note: sanityEnabled is NOT reset - that's a settings preference
+    state.evidenceState = {}
   }
   
   const drainSanity = (amount) => {
