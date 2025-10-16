@@ -62,36 +62,65 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useSharedState } from '../composables/useSharedState'
+import * as lifx from '../utils/lifx'
 
 const { state, updateState, addLog } = useSharedState()
 
 const emit = defineEmits(['back'])
 
-// Local state
-const upstairsLights = ref(state.upstairsLights !== undefined ? state.upstairsLights : true)
-const downstairsLights = ref(state.downstairsLights !== undefined ? state.downstairsLights : true)
+// Local state - sync with lightState (on/off/flicker)
+const upstairsLights = ref(state.lightState === 'on')
+const downstairsLights = ref(state.lightState === 'on')
 
 // Methods
-const toggleUpstairs = () => {
+const toggleUpstairs = async () => {
   updateState({ upstairsLights: upstairsLights.value })
   addLog(`Upstairs lights turned ${upstairsLights.value ? 'ON' : 'OFF'}`)
+  
+  // Control LIFX lights - turn on to default state or off
+  if (lifx.isLifxConfigured()) {
+    try {
+      if (upstairsLights.value) {
+        await lifx.turnOn()
+        updateState({ lightState: 'on' })
+      } else {
+        await lifx.turnOff()
+        updateState({ lightState: 'off' })
+      }
+    } catch (error) {
+      console.error('LIFX control error:', error)
+    }
+  }
 }
 
-const toggleDownstairs = () => {
+const toggleDownstairs = async () => {
   updateState({ downstairsLights: downstairsLights.value })
   addLog(`Downstairs lights turned ${downstairsLights.value ? 'ON' : 'OFF'}`)
+  
+  // Control LIFX lights - turn on to default state or off
+  if (lifx.isLifxConfigured()) {
+    try {
+      if (downstairsLights.value) {
+        await lifx.turnOn()
+        updateState({ lightState: 'on' })
+      } else {
+        await lifx.turnOff()
+        updateState({ lightState: 'off' })
+      }
+    } catch (error) {
+      console.error('LIFX control error:', error)
+    }
+  }
 }
 
-// Sync with shared state
+// Sync with shared state - reflect light state
 let syncInterval
 onMounted(() => {
   syncInterval = setInterval(() => {
-    if (state.upstairsLights !== undefined) {
-      upstairsLights.value = state.upstairsLights
-    }
-    if (state.downstairsLights !== undefined) {
-      downstairsLights.value = state.downstairsLights
-    }
+    // Sync with lightState - on or flicker means switches on, off means switches off
+    const isOn = state.lightState === 'on' || state.lightState === 'flicker'
+    upstairsLights.value = isOn
+    downstairsLights.value = isOn
   }, 500)
 })
 

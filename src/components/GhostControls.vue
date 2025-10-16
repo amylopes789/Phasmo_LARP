@@ -92,6 +92,7 @@
               @click="setLight('on')" 
               class="light-btn light-on-btn"
               :class="{ active: lightState === 'on' }"
+              :disabled="isHunting"
             >
               ON
             </button>
@@ -99,6 +100,7 @@
               @click="setLight('off')" 
               class="light-btn light-off-btn"
               :class="{ active: lightState === 'off' }"
+              :disabled="isHunting"
             >
               OFF
             </button>
@@ -106,12 +108,14 @@
               @click="setLight('flicker')" 
               class="light-btn light-flicker-btn"
               :class="{ active: lightState === 'flicker' }"
+              :disabled="isHunting"
             >
               FLICKER
             </button>
           </div>
           <div class="light-status">
             Status: {{ getLightStatusText() }}
+            <span v-if="isHunting" class="hunt-notice">⚠️ Disabled during hunt</span>
           </div>
         </div>
 
@@ -488,7 +492,10 @@ const toggleHunt = async () => {
       huntTimeout = null
     }
     
-    // Restore LIFX lights to default Ultra Warm
+    // Restore LIFX lights to default Ultra Warm and set light state to ON
+    lightState.value = 'on'
+    updateState({ lightState: 'on' })
+    
     if (lifx.isLifxConfigured()) {
       try {
         await lifx.restoreDefault()
@@ -515,6 +522,9 @@ const toggleHunt = async () => {
     updateState({ isHunting: true })
     addLog(`HUNT STARTED in ${selectedRoom.value}`)
     
+    // Stop any flicker effect
+    lifx.stopFlicker()
+    
     // Set LIFX lights to RED for hunt
     if (lifx.isLifxConfigured()) {
       try {
@@ -537,7 +547,10 @@ const toggleHunt = async () => {
       addLog('Hunt ended')
       huntTimeout = null
       
-      // Restore LIFX lights to default Ultra Warm
+      // Restore LIFX lights to default Ultra Warm and set light state to ON
+      lightState.value = 'on'
+      updateState({ lightState: 'on' })
+      
       if (lifx.isLifxConfigured()) {
         try {
           await lifx.restoreDefault()
@@ -734,6 +747,13 @@ onUnmounted(() => {
   color: #333;
 }
 
+.light-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
 .light-on-btn {
   border-color: #ffd700;
 }
@@ -783,6 +803,12 @@ onUnmounted(() => {
   animation: flickerOrange 0.5s infinite;
 }
 
+.light-flicker-btn.active:disabled {
+  animation: none;
+  background: white;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
 @keyframes flickerOrange {
   0%, 100% { 
     background: white;
@@ -803,6 +829,19 @@ onUnmounted(() => {
   padding: 8px;
   background: rgba(0, 0, 0, 0.05);
   border-radius: 5px;
+}
+
+.hunt-notice {
+  display: block;
+  color: #ff0844;
+  font-weight: bold;
+  margin-top: 5px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
 }
 
 .divider {
