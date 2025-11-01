@@ -46,7 +46,7 @@
         </div>
         <div class="setting-item">
           <button @click="showLifxSettings = true" class="lifx-settings-btn">
-            💡 Configure LIFX Smart Lights
+            💡 Configure Connections
           </button>
           <p class="setting-description">
             {{ lifxStatus }}

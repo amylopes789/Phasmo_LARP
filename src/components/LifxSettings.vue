@@ -31,9 +31,20 @@
           </button>
         </div>
 
+        <div class="ip-input-section">
+          <label for="server-ip">Server IP:</label>
+          <input
+            id="server-ip"
+            v-model="serverIP"
+            type="text"
+            placeholder="e.g., 192.168.1.100:3000"
+            class="ip-input"
+          />
+        </div>
+
         <div class="button-group">
-          <button @click="saveToken" class="save-btn" :disabled="!token.trim()">
-            💾 Save Token
+          <button @click="saveSettings" class="save-btn" :disabled="!token.trim() && !serverIP.trim()">
+            💾 Save Settings
           </button>
           <button @click="testConnection" class="test-btn" v-if="hasToken">
             🔌 Test Connection
@@ -62,18 +73,25 @@ import { ref, onMounted } from 'vue'
 const emit = defineEmits(['close', 'saved'])
 
 const token = ref('')
+const serverIP = ref('')
 const showToken = ref(false)
 const hasToken = ref(false)
 const statusMessage = ref('')
 const statusType = ref('')
 
 const STORAGE_KEY = 'lifx_token'
+const IP_STORAGE_KEY = 'server_ip'
 
 onMounted(() => {
   const saved = localStorage.getItem(STORAGE_KEY)
   if (saved) {
     token.value = saved
     hasToken.value = true
+  }
+  
+  const savedIP = localStorage.getItem(IP_STORAGE_KEY)
+  if (savedIP) {
+    serverIP.value = savedIP
   }
 })
 
@@ -83,16 +101,29 @@ const toggleShowToken = () => {
   input.type = showToken.value ? 'text' : 'password'
 }
 
-const saveToken = () => {
-  const trimmed = token.value.trim()
-  if (!trimmed) return
+const saveSettings = () => {
+  const trimmedToken = token.value.trim()
+  const trimmedIP = serverIP.value.trim()
+  
+  if (!trimmedToken && !trimmedIP) return
 
-  localStorage.setItem(STORAGE_KEY, trimmed)
-  hasToken.value = true
+  let saveMessages = []
   
-  showStatus('✅ Token saved successfully!', 'success')
+  if (trimmedToken) {
+    localStorage.setItem(STORAGE_KEY, trimmedToken)
+    hasToken.value = true
+    saveMessages.push('LIFX token')
+  }
   
-  // Reload to apply token
+  if (trimmedIP) {
+    localStorage.setItem(IP_STORAGE_KEY, trimmedIP)
+    saveMessages.push('Server IP')
+  }
+  
+  const message = `✅ ${saveMessages.join(' and ')} saved successfully!`
+  showStatus(message, 'success')
+  
+  // Reload to apply settings
   setTimeout(() => {
     window.location.reload()
   }, 1000)
@@ -268,6 +299,35 @@ const showStatus = (message, type) => {
   border-color: #4CAF50;
 }
 
+.ip-input-section {
+  margin-bottom: 20px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.ip-input-section label {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1.1rem;
+  color: #333;
+  min-width: 100px;
+}
+
+.ip-input {
+  flex: 1;
+  padding: 12px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-family: monospace;
+  font-size: 0.9rem;
+  transition: border-color 0.3s ease;
+}
+
+.ip-input:focus {
+  outline: none;
+  border-color: #4CAF50;
+}
+
 .show-btn {
   padding: 12px 20px;
   background: #6c757d;
@@ -376,7 +436,8 @@ const showStatus = (message, type) => {
 }
 
 @media (max-width: 768px) {
-  .token-input-section {
+  .token-input-section,
+  .ip-input-section {
     flex-direction: column;
     align-items: stretch;
   }

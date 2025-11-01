@@ -446,14 +446,30 @@ const triggerInteraction = () => {
     }, 1000)
   }
   
-  // Send POST message
-  sendPostMessage({
-    type: 'ghost_interaction',
+  // Send POST messages
+  const postData = {
     interaction: interaction,
     room: selectedRoom.value,
     ghost: selectedGhost.value,
     timestamp: new Date().toISOString()
-  })
+  }
+  
+  // Always send /interact request
+  sendPostMessage('/interact', postData)
+  
+  // Get current ghost's evidence
+  const currentGhost = ghostTypes.find(g => g.name === selectedGhost.value)
+  if (currentGhost) {
+    // Send /emf if ghost has EMF Level 5
+    if (currentGhost.evidence.includes('EMF 5')) {
+      sendPostMessage('/emf', postData)
+    }
+    
+    // Send /freeze if ghost has Freezing Temperatures
+    if (currentGhost.evidence.includes('Freezing')) {
+      sendPostMessage('/freeze', postData)
+    }
+  }
 }
   
 // Helper function to start hunt cooldown
@@ -509,8 +525,7 @@ const toggleHunt = async () => {
     startHuntCooldown()
     
     // Send POST message
-    sendPostMessage({
-      type: 'hunt',
+    sendPostMessage('/hunt', {
       action: 'cancel',
       room: selectedRoom.value,
       ghost: selectedGhost.value,
@@ -565,8 +580,7 @@ const toggleHunt = async () => {
     }, 60000)
     
     // Send POST message
-    sendPostMessage({
-      type: 'hunt',
+    sendPostMessage('/hunt', {
       action: 'start',
       room: selectedRoom.value,
       ghost: selectedGhost.value,
@@ -576,9 +590,37 @@ const toggleHunt = async () => {
   }
 }
   
-const sendPostMessage = async (data) => {
-  console.log('POST Message:', data)
-  // Extend this function to send POST requests to your backend server
+const sendPostMessage = async (endpoint, data) => {
+  console.log(`POST Message to ${endpoint}:`, data)
+  
+  const serverIP = localStorage.getItem('server_ip')
+  if (!serverIP) {
+    console.log('No server IP configured. Skipping POST request.')
+    return
+  }
+  
+  try {
+    let baseUrl = serverIP.startsWith('http') ? serverIP : `http://${serverIP}`
+    // Remove trailing slash if present
+    baseUrl = baseUrl.replace(/\/$/, '')
+    const url = `${baseUrl}${endpoint}`
+    
+    const response = await fetch(url, {
+      method: 'POST',
+      // headers: {
+      //   'Content-Type': 'application/json'
+      // },
+      // body: JSON.stringify(data)
+    })
+    
+    if (response.ok) {
+      console.log(`POST request to ${endpoint} successful:`, await response.json())
+    } else {
+      console.error(`POST request to ${endpoint} failed:`, response.status, response.statusText)
+    }
+  } catch (error) {
+    console.error(`Failed to send POST request to ${endpoint}:`, error)
+  }
 }
   
   // Sync with shared state
