@@ -463,11 +463,14 @@ const triggerInteraction = () => {
     let delay = 5000 // 5 seconds delay
     const difficultyChance = state.difficulty || 10 // Default to 10 if not set
     
+    let messageSent = false;
+
     // Send /emf if ghost has EMF Level 5 (with difficulty-based chance)
     if (currentGhost.evidence.includes('EMF 5')) {
       const randomRoll = Math.floor(Math.random() * 10) + 1 // Random number 1-10
       if (randomRoll <= difficultyChance) {
         setTimeout(() => {
+          messageSent = true;
           sendPostMessage('/emf', postData)
           addLog(`EMF Level 5 detected! (${difficultyChance}/10 chance)`)
         }, delay)
@@ -478,7 +481,7 @@ const triggerInteraction = () => {
     }
     
     // Send /freeze if ghost has Freezing Temperatures (with difficulty-based chance)
-    if (currentGhost.evidence.includes('Freezing')) {
+    if (currentGhost.evidence.includes('Freezing') && !messageSent) {
       const randomRoll = Math.floor(Math.random() * 10) + 1 // Random number 1-10
       if (randomRoll <= difficultyChance) {
         setTimeout(() => {
