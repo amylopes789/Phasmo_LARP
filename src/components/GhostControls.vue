@@ -607,19 +607,19 @@ const sendPostMessage = async (endpoint, data) => {
     
     const response = await fetch(url, {
       method: 'POST',
-      // headers: {
-      //   'Content-Type': 'application/json'
-      // },
-      // body: JSON.stringify(data)
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
     })
     
     if (response.ok) {
-      console.log(`POST request to ${endpoint} successful:`, await response.json())
+      console.log(`✅ POST to ${endpoint} successful`)
     } else {
-      console.error(`POST request to ${endpoint} failed:`, response.status, response.statusText)
+      console.warn(`⚠️ POST to ${endpoint} failed: ${response.status} ${response.statusText}`)
     }
   } catch (error) {
-    console.error(`Failed to send POST request to ${endpoint}:`, error)
+    console.warn(`❌ POST to ${endpoint} error:`, error.message)
   }
 }
   
