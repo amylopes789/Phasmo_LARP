@@ -45,6 +45,22 @@
           </p>
         </div>
         <div class="setting-item">
+          <div class="setting-label-slider">
+            <span class="setting-text">Evidence Difficulty: {{ difficulty }}/10</span>
+          </div>
+          <input 
+            type="range" 
+            min="1" 
+            max="10" 
+            v-model.number="difficulty"
+            @input="updateDifficulty"
+            class="difficulty-slider"
+          >
+          <p class="setting-description">
+            Controls the chance of EMF and Freezing evidence appearing ({{ difficulty }} in 10 chance per interaction)
+          </p>
+        </div>
+        <div class="setting-item">
           <button @click="showLifxSettings = true" class="lifx-settings-btn">
             💡 Configure Connections
           </button>
@@ -84,6 +100,7 @@ const { state, updateState, resetState } = useSharedState()
 
 const selectedRole = ref(null)
 const sanityEnabled = ref(state.sanityEnabled || false)
+const difficulty = ref(state.difficulty || 10)
 const showLifxSettings = ref(false)
 const lifxConfigured = ref(false)
 
@@ -115,6 +132,10 @@ const toggleSanity = () => {
   if (!sanityEnabled.value) {
     updateState({ sanity: 100 })
   }
+}
+
+const updateDifficulty = () => {
+  updateState({ difficulty: difficulty.value })
 }
 
 const resetGame = async () => {
@@ -341,6 +362,10 @@ const resetGame = async () => {
   margin-bottom: 8px;
 }
 
+.setting-label-slider {
+  margin-bottom: 12px;
+}
+
 .setting-checkbox {
   width: 24px;
   height: 24px;
@@ -353,6 +378,52 @@ const resetGame = async () => {
   font-size: 1.1rem;
   color: #333;
   font-weight: bold;
+}
+
+.difficulty-slider {
+  width: 100%;
+  height: 8px;
+  border-radius: 5px;
+  background: linear-gradient(to right, #ff0844 0%, #ffd700 50%, #4CAF50 100%);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+
+.difficulty-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: white;
+  border: 3px solid #333;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+.difficulty-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+}
+
+.difficulty-slider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: white;
+  border: 3px solid #333;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+.difficulty-slider::-moz-range-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
 }
 
 .setting-description {

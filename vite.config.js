@@ -5,8 +5,7 @@ export default defineConfig({
   plugins: [vue()],
   base: '/Phasmo_LARP/',
   server: {
-    port: 3000,
-    host: true // Allow access from network devices
+    port: 3000
   },
   build: {
     outDir: 'dist',

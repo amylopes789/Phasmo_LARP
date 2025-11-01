@@ -23,7 +23,8 @@ const loadState = () => {
     activityLog: [],
     sanity: 100,
     sanityEnabled: false,
-    evidenceState: {}
+    evidenceState: {},
+    difficulty: 10 // 1-10 scale, represents X in 10 chance for evidence requests
   }
 }
 
@@ -97,7 +98,7 @@ export function useSharedState() {
     state.isHunting = false
     state.activityLog = []
     state.sanity = 100
-    // Note: sanityEnabled is NOT reset - that's a settings preference
+    // Note: sanityEnabled and difficulty are NOT reset - those are settings preferences
     state.evidenceState = {}
   }
   

@@ -446,7 +446,7 @@ const triggerInteraction = () => {
     }, 1000)
   }
   
-  // Send POST messages
+  // Send POST messages with delays to avoid overloading the server
   const postData = {
     interaction: interaction,
     room: selectedRoom.value,
@@ -460,14 +460,34 @@ const triggerInteraction = () => {
   // Get current ghost's evidence
   const currentGhost = ghostTypes.find(g => g.name === selectedGhost.value)
   if (currentGhost) {
-    // Send /emf if ghost has EMF Level 5
+    let delay = 5000 // 5 seconds delay
+    const difficultyChance = state.difficulty || 10 // Default to 10 if not set
+    
+    // Send /emf if ghost has EMF Level 5 (with difficulty-based chance)
     if (currentGhost.evidence.includes('EMF 5')) {
-      sendPostMessage('/emf', postData)
+      const randomRoll = Math.floor(Math.random() * 10) + 1 // Random number 1-10
+      if (randomRoll <= difficultyChance) {
+        setTimeout(() => {
+          sendPostMessage('/emf', postData)
+          addLog(`EMF Level 5 detected! (${difficultyChance}/10 chance)`)
+        }, delay)
+      } else {
+        addLog(`EMF interaction occurred but no Level 5 detected (${difficultyChance}/10 chance)`)
+      }
+      delay += 5000 // Add another 5 seconds for the next request
     }
     
-    // Send /freeze if ghost has Freezing Temperatures
+    // Send /freeze if ghost has Freezing Temperatures (with difficulty-based chance)
     if (currentGhost.evidence.includes('Freezing')) {
-      sendPostMessage('/freeze', postData)
+      const randomRoll = Math.floor(Math.random() * 10) + 1 // Random number 1-10
+      if (randomRoll <= difficultyChance) {
+        setTimeout(() => {
+          sendPostMessage('/freeze', postData)
+          addLog(`Freezing temperatures detected! (${difficultyChance}/10 chance)`)
+        }, delay)
+      } else {
+        addLog(`Temperature dropped but not freezing (${difficultyChance}/10 chance)`)
+      }
     }
   }
 }
@@ -605,21 +625,29 @@ const sendPostMessage = async (endpoint, data) => {
     baseUrl = baseUrl.replace(/\/$/, '')
     const url = `${baseUrl}${endpoint}`
     
+    console.log(`Sending POST to: ${url}`)
+    
     const response = await fetch(url, {
       method: 'POST',
+      mode: 'no-cors', // Allow cross-origin requests without CORS
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(data)
     })
     
-    if (response.ok) {
-      console.log(`✅ POST to ${endpoint} successful`)
+    // Note: with no-cors mode, we can't read the response
+    if (response.type === 'opaque') {
+      console.log(`✅ POST to ${endpoint} sent (no-cors mode, response not readable)`)
+    } else if (response.ok) {
+      const responseData = await response.json()
+      console.log(`✅ POST to ${endpoint} successful:`, responseData)
     } else {
       console.warn(`⚠️ POST to ${endpoint} failed: ${response.status} ${response.statusText}`)
     }
   } catch (error) {
-    console.warn(`❌ POST to ${endpoint} error:`, error.message)
+    console.error(`❌ Failed to send POST to ${endpoint}:`, error.message)
+    console.error('Full error:', error)
   }
 }
   
